@@ -46,10 +46,7 @@ const browsers = [ // 対応ブラウザの指定
   'ios >= 8',
   'and_chr >= 5',
   'Android >= 5',
-];
-
-const postcssUncss = require('postcss-uncss');
-
+]
 const cssSass = () => {
   return src(srcPath.css)
     .pipe(sourcemaps.init()) // ソースマップの初期化
@@ -62,23 +59,18 @@ const cssSass = () => {
       includePaths: ['src/sass'], // 相対パス省略
       outputStyle: 'expanded' // 出力形式をCSSの一般的な記法にする
     }))
-    .pipe(postcss([
-      cssnext({
-        features: {
-          rem: false
-        }
-      }, browsers),
-      postcssUncss({
-        html: [distPath.php] // uncssが適用するHTMLファイルのパス
-      })
-    ])) // 最新CSS使用を先取り
+    .pipe(postcss([cssnext({
+      features: {
+        rem: false
+      }
+    },browsers)])) // 最新CSS使用を先取り
     .pipe(sourcemaps.write('./')) // ソースマップの出力先をcssファイルから見たパスに指定
-    .pipe(dest(distPath.css))
+    .pipe(dest(distPath.css)) //
     .pipe(notify({ // エラー発生時のアラート出力
       message: 'Sassをコンパイルしてるんやで〜！',
       onLast: true
-    }));
-};
+    }))
+}
 
 // 画像圧縮
 const imagemin = require("gulp-imagemin"); // 画像圧縮
