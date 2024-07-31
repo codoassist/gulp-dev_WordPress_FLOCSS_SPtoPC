@@ -1,5 +1,3 @@
-// gulpのメソッド呼び出し
-// src：参照元指定、dest：出力先指定、watch：ファイル監視、series：直列処理、parallel：並列処理
 const { src, dest, watch, series, parallel } = require("gulp");
 
 // 入出力先指定
@@ -9,11 +7,12 @@ const distBase = `../${themeName}`;
 const srcPath = {
   css: srcBase + '/sass/**/*.scss',
   img: srcBase + '/images/**/*',
+  js: srcBase + '/js/**/*.js', // 追加
 };
 const distPath = {
   css: distBase + '/assets/css/',
   img: distBase + '/assets/images/',
-  js: distBase + '/assets/js/**/*.js',
+  js: distBase + '/assets/js/', // 修正
   php: distBase + '/**/*.php',
 };
 
@@ -38,6 +37,8 @@ const notify = require("gulp-notify"); // エラー発生時のアラート出�
 const postcss = require("gulp-postcss"); // PostCSS利用
 const cssnext = require("postcss-cssnext"); // 最新CSS使用を先取り
 const sourcemaps = require("gulp-sourcemaps"); // ソースマップ生成
+const cleanCSS = require('gulp-clean-css'); // CSS圧縮
+const uglify = require('gulp-uglify'); // JavaScript圧縮
 const browsers = [ // 対応ブラウザの指定
   'last 2 versions',
   '> 5%',
@@ -64,10 +65,11 @@ const cssSass = () => {
         rem: false
       }
     },browsers)])) // 最新CSS使用を先取り
+    .pipe(cleanCSS({ compatibility: 'ie8' })) // CSS圧縮
     .pipe(sourcemaps.write('./')) // ソースマップの出力先をcssファイルから見たパスに指定
     .pipe(dest(distPath.css)) //
     .pipe(notify({ // エラー発生時のアラート出力
-      message: 'Sassをコンパイルしてるんやで〜！',
+      message: 'Sassをコンパイルして圧縮してるんやで〜！',
       onLast: true
     }))
 }
@@ -98,11 +100,25 @@ const imgImagemin = () => {
     .pipe(dest(distPath.img));
 };
 
+// JavaScript圧縮
+const jsUglify = () => {
+  return src(srcPath.js)
+    .pipe(plumber({
+      errorHandler: notify.onError('Error:<%= error.message %>')
+    }))
+    .pipe(uglify()) // JavaScript圧縮
+    .pipe(dest(distPath.js)) // 圧縮されたJSを出力
+    .pipe(notify({
+      message: 'JavaScriptを圧縮してるんやで〜！',
+      onLast: true
+    }));
+};
+
 // ファイルの変更を検知
 const watchFiles = () => {
   watch(srcPath.css, series(cssSass, browserSyncReload));
   watch(srcPath.img, series(imgImagemin, browserSyncReload));
-  watch(distPath.js, series(browserSyncReload));
+  watch(srcPath.js, series(jsUglify, browserSyncReload)); // 追加
   watch(distPath.php, series(browserSyncReload));
 };
 
@@ -112,13 +128,15 @@ const delPath = {
   css: distBase + '/assets/css/styles.css',
   cssMap: distBase + '/assets/css/styles.css.map',
   img: distBase + '/assets/images/',
+  js: distBase + '/assets/js/**/*.js', // 追加
 };
 const clean = (done) => {
   del(delPath.css, { force: true });
   del(delPath.cssMap, { force: true });
   del(delPath.img, { force: true });
+  del(delPath.js, { force: true }); // 追加
   done();
 };
 
 // 実行
-exports.default = series(series(clean, imgImagemin, cssSass), parallel(watchFiles, browserSyncFunc));
+exports.default = series(series(clean, imgImagemin, cssSass, jsUglify), parallel(watchFiles, browserSyncFunc));
