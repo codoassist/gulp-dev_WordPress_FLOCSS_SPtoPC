@@ -21,7 +21,6 @@
 - 画像はsrcフォルダのimagesの中に格納する
 - コンパイルされたCSSと圧縮された画像はWordPressTheme/assetsフォルダの中に出力される
 - phpはWordPressTheme直下のphpファイルに直接記述する
-- jsはWordPressTheme/assets直下のjsファイルに直接記述する（圧縮なし）
 
 ## 備考
 - CSS設計はFLOCSS( https://github.com/hiloki/flocss )を採用
