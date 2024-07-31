@@ -7,12 +7,12 @@ const distBase = `../${themeName}`;
 const srcPath = {
   css: srcBase + '/sass/**/*.scss',
   img: srcBase + '/images/**/*',
-  js: srcBase + '/js/**/*.js', // 追加
+  js: srcBase + '/js/**/*.js',
 };
 const distPath = {
   css: distBase + '/assets/css/',
   img: distBase + '/assets/images/',
-  js: distBase + '/assets/js/', // 修正
+  js: distBase + '/assets/js/',
   php: distBase + '/**/*.php',
 };
 
@@ -38,6 +38,7 @@ const postcss = require("gulp-postcss"); // PostCSS利用
 const cssnext = require("postcss-cssnext"); // 最新CSS使用を先取り
 const sourcemaps = require("gulp-sourcemaps"); // ソースマップ生成
 const cleanCSS = require('gulp-clean-css'); // CSS圧縮
+const rename = require('gulp-rename'); // ファイル名変更
 const uglify = require('gulp-uglify'); // JavaScript圧縮
 const browsers = [ // 対応ブラウザの指定
   'last 2 versions',
@@ -48,6 +49,7 @@ const browsers = [ // 対応ブラウザの指定
   'and_chr >= 5',
   'Android >= 5',
 ]
+
 const cssSass = () => {
   return src(srcPath.css)
     .pipe(sourcemaps.init()) // ソースマップの初期化
@@ -65,9 +67,11 @@ const cssSass = () => {
         rem: false
       }
     },browsers)])) // 最新CSS使用を先取り
-    .pipe(cleanCSS({ compatibility: 'ie8' })) // CSS圧縮
     .pipe(sourcemaps.write('./')) // ソースマップの出力先をcssファイルから見たパスに指定
-    .pipe(dest(distPath.css)) //
+    .pipe(dest(distPath.css)) // 元のディレクトリに出力
+    .pipe(cleanCSS({ compatibility: 'ie8' })) // CSS圧縮
+    .pipe(rename({ suffix: '.min' })) // 圧縮されたCSSのファイル名に`.min`を追加
+    .pipe(dest(distPath.css)) // 圧縮されたCSSをassetsフォルダに出力
     .pipe(notify({ // エラー発生時のアラート出力
       message: 'Sassをコンパイルして圧縮してるんやで〜！',
       onLast: true
@@ -106,10 +110,12 @@ const jsUglify = () => {
     .pipe(plumber({
       errorHandler: notify.onError('Error:<%= error.message %>')
     }))
+    .pipe(dest(distPath.js)) // 元のディレクトリに出力
     .pipe(uglify()) // JavaScript圧縮
-    .pipe(dest(distPath.js)) // 圧縮されたJSを出力
+    .pipe(rename({ suffix: '.min' })) // 圧縮されたJSのファイル名に`.min`を追加
+    .pipe(dest(distPath.js)) // 圧縮されたJSをassetsフォルダに出力
     .pipe(notify({
-      message: 'JavaScriptを圧縮してるんやで〜！',
+      message: 'JavaScriptをコンパイルして圧縮してるんやで〜！',
       onLast: true
     }));
 };
