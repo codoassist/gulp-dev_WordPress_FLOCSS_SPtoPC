@@ -1,8 +1,0 @@
-@use "global" as *;
-
-.u-desktop {
-  display: none;
-  @include mq(md) {
-    display: block;
-  }
-}

@@ -7,7 +7,7 @@
 /**
  * WordPress標準機能
  *
- * @codex https://wpdocs.osdn.jp/%E9%96%A2%E6%95%B0%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9/add_theme_support
+ * @link https://developer.wordpress.org/reference/functions/add_theme_support/
  */
 function my_setup() {
 	add_theme_support( 'post-thumbnails' ); /* アイキャッチ */
@@ -21,6 +21,8 @@ function my_setup() {
 			'comment-list',
 			'gallery',
 			'caption',
+			'script',
+			'style',
 		)
 	);
 }
@@ -30,17 +32,23 @@ add_action( 'after_setup_theme', 'my_setup' );
 /**
  * CSSとJavaScriptの読み込み
  *
- * @codex https://wpdocs.osdn.jp/%E3%83%8A%E3%83%93%E3%82%B2%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%A1%E3%83%8B%E3%83%A5%E3%83%BC
+ * @link https://developer.wordpress.org/reference/functions/wp_enqueue_style/
+ * @link https://developer.wordpress.org/reference/functions/wp_enqueue_script/
  */
 function my_script_init()
 {
+	$theme_dir = get_template_directory();      // ファイルの場所（サーバー上のパス）
+	$theme_uri = get_template_directory_uri();  // ファイルのURL
+
 	// jQueryの読み込み
 	wp_deregister_script('jquery');
-	wp_enqueue_script('jquery', '//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js', "", "1.0.1");
-	wp_enqueue_style('swiper', get_template_directory_uri() . '/assets/css/swiper-bundle.min.css', array(), '1.0.1', 'all');
-	wp_enqueue_style( 'my', get_template_directory_uri() . '/assets/css/styles.min.css', array(), '1.0.1', 'all' );
-	wp_enqueue_script( 'swiper', get_template_directory_uri() . '/assets/js/swiper-bundle.min.js', array( 'jquery' ), '1.0.1', true );
-	wp_enqueue_script( 'my', get_template_directory_uri() . '/assets/js/script.min.js', array( 'jquery' ), '1.0.1', true );
+	wp_enqueue_script('jquery', 'https://code.jquery.com/jquery-3.7.1.min.js', array(), '3.7.1');
+
+	// バージョンにファイルの更新日時を使う（ファイルを更新すると自動でキャッシュが切り替わる）
+	wp_enqueue_style( 'swiper', $theme_uri . '/assets/css/swiper-bundle.min.css', array(), filemtime( $theme_dir . '/assets/css/swiper-bundle.min.css' ), 'all' );
+	wp_enqueue_style( 'my', $theme_uri . '/assets/css/styles.min.css', array(), filemtime( $theme_dir . '/assets/css/styles.min.css' ), 'all' );
+	wp_enqueue_script( 'swiper', $theme_uri . '/assets/js/swiper-bundle.min.js', array( 'jquery' ), filemtime( $theme_dir . '/assets/js/swiper-bundle.min.js' ), true );
+	wp_enqueue_script( 'my', $theme_uri . '/assets/js/script.min.js', array( 'jquery' ), filemtime( $theme_dir . '/assets/js/script.min.js' ), true );
 }
 add_action('wp_enqueue_scripts', 'my_script_init');
 
@@ -56,17 +64,17 @@ function my_archive_title( $title ) {
 	if ( is_home() ) { /* ホームの場合 */
 		$title = 'ブログ';
 	} elseif ( is_category() ) { /* カテゴリーアーカイブの場合 */
-		$title = '' . single_cat_title( '', false ) . '';
+		$title = single_cat_title( '', false );
 	} elseif ( is_tag() ) { /* タグアーカイブの場合 */
-		$title = '' . single_tag_title( '', false ) . '';
+		$title = single_tag_title( '', false );
 	} elseif ( is_post_type_archive() ) { /* 投稿タイプのアーカイブの場合 */
-		$title = '' . post_type_archive_title( '', false ) . '';
+		$title = post_type_archive_title( '', false );
 	} elseif ( is_tax() ) { /* タームアーカイブの場合 */
-		$title = '' . single_term_title( '', false );
+		$title = single_term_title( '', false );
 	} elseif ( is_search() ) { /* 検索結果アーカイブの場合 */
 		$title = '「' . esc_html( get_query_var( 's' ) ) . '」の検索結果';
 	} elseif ( is_author() ) { /* 作者アーカイブの場合 */
-		$title = '' . get_the_author() . '';
+		$title = get_the_author();
 	} elseif ( is_date() ) { /* 日付アーカイブの場合 */
 		$title = '';
 		if ( get_query_var( 'year' ) ) {
@@ -80,7 +88,7 @@ function my_archive_title( $title ) {
 		}
 	}
 	return $title;
-};
+}
 add_filter( 'get_the_archive_title', 'my_archive_title' );
 
 
@@ -105,7 +113,7 @@ add_filter( 'get_the_archive_title', 'my_archive_title' );
 /**
  * メニューの登録
  *
- * @codex https://wpdocs.osdn.jp/%E9%96%A2%E6%95%B0%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9/register_nav_menus
+ * @link https://developer.wordpress.org/reference/functions/register_nav_menus/
  */
 // function my_menu_init() {
 // 	register_nav_menus(

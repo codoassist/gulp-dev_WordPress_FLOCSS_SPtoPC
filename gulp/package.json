@@ -1,7 +1,7 @@
 {
   "name": "gulp-dev-wordpress-flocss-sptopc",
   "description": "コードアシスト Gulp環境（WordPress・SPファースト）",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "license": "ISC",
   "engines": {
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "gulp",
     "build": "gulp build",
-    "build:prod": "NODE_ENV=production gulp build"
+    "build:prod": "cross-env NODE_ENV=production gulp build"
   },
   "browserslist": [
     "> 0.5%",
@@ -21,6 +21,7 @@
   ],
   "devDependencies": {
     "browser-sync": "^3.0.3",
+    "cross-env": "^10.1.0",
     "gulp": "^5.0.0",
     "gulp-clean-css": "^4.3.0",
     "gulp-plumber": "^1.2.1",

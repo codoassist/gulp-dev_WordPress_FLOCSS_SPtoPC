@@ -5,8 +5,8 @@ $breakpointInner: $innerWidth + strip-unit($padding-pc) * 2;
 
 // ルートフォント設定
 html {
-    // 376px ~ 767px
-    font-size: 100%;
+  // 376px ~ 767px
+  font-size: 100%;
 
   // ~ 375px
   @media (max-width: 375px) {
@@ -34,11 +34,16 @@ body {
 // ホバー
 a,
 button {
-  @include mq(md) {
-    transition: .3s;
-    &:hover {
-      opacity: 0.7;
-      cursor: pointer;
-    }
+  transition: opacity .3s;
+}
+
+button {
+  cursor: pointer;
+}
+
+@media (any-hover: hover) {
+  a:hover,
+  button:hover {
+    opacity: 0.7;
   }
 }

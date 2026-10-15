@@ -1,7 +1,8 @@
 @use "global" as *;
 
-.u-mobile {
+.u-pc {
+  display: none;
   @include mq(md) {
-    display: none;
+    display: block;
   }
 }

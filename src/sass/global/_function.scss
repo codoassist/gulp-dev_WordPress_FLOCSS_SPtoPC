@@ -2,7 +2,7 @@
 @use "sass:meta";
 
 // pxからremへの計算式
-@function myrem($pixels) {
+@function rem($pixels) {
   @return math.div($pixels, 16) * 1rem;
 }
 
